@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Download, Shield, CheckCircle, Loader2, AlertTriangle } from 'lucide-react';
+import { Download, Shield, CircleCheck as CheckCircle, Loader as Loader2, TriangleAlert as AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { AppItem, AppListItem } from '@/lib/types';
 import { formatDownloads } from '@/lib/queries';
