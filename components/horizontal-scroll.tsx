@@ -5,12 +5,12 @@ import Link from 'next/link';
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AppCard } from './app-card';
-import type { AppListItem } from '@/lib/types';
+import type { AppItem } from '@/lib/types';
 
 interface HorizontalScrollProps {
   title: string;
   icon?: React.ReactNode;
-  items: AppListItem[];
+  items: AppItem[];
   viewAllHref?: string;
 }
 

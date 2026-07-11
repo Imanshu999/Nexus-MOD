@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { AppCard } from '@/components/app-card';
 import { FilterChip } from '@/components/filter-chip';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { AppListItem, Category } from '@/lib/types';
+import type { AppItem, Category } from '@/lib/types';
 
 interface CategoryPageProps {
   type: 'game' | 'app';
@@ -14,7 +14,7 @@ interface CategoryPageProps {
 
 export function CategoryPage({ type, categories }: CategoryPageProps) {
   const searchParams = useSearchParams();
-  const [items, setItems] = useState<AppListItem[]>([]);
+  const [items, setItems] = useState<AppItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -99,7 +99,7 @@ export function CategoryPage({ type, categories }: CategoryPageProps) {
           </FilterChip>
           {typeCategories.map((cat) => (
             <FilterChip
-              key={cat.id}
+              key={cat.slug}
               active={selectedCategory === cat.slug}
               onClick={() => handleCategoryClick(cat.slug)}
             >

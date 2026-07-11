@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { searchApps } from '@/lib/data';
 
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_WINDOW = 60 * 1000;
@@ -43,7 +43,6 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const rawQuery = searchParams.get('q') || '';
   const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 50);
-
   const query = sanitizeQuery(rawQuery);
 
   if (query.length < 2) {
@@ -51,25 +50,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { data, error } = await supabase.rpc('search_apps', {
-      search_term: query,
-      result_limit: limit,
-    });
-
-    if (error) {
-      const { data: fallbackData, error: fallbackError } = await supabase
-        .from('apps')
-        .select('slug, title, icon_url, type')
-        .ilike('title', `%${query}%`)
-        .order('downloads', { ascending: false })
-        .limit(limit);
-
-      if (fallbackError) throw fallbackError;
-
-      return NextResponse.json({ results: fallbackData || [] });
-    }
-
-    return NextResponse.json({ results: data || [] });
+    const results = searchApps(query, limit);
+    return NextResponse.json({ results });
   } catch (err) {
     console.error('Search error:', err);
     return NextResponse.json({ error: 'Search failed' }, { status: 500 });

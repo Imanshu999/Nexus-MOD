@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Download, ChevronLeft, ChevronRight, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { AppListItem } from '@/lib/types';
+import type { AppItem } from '@/lib/types';
 
 interface HeroCarouselProps {
-  items: AppListItem[];
+  items: AppItem[];
 }
 
 export function HeroCarousel({ items }: HeroCarouselProps) {
@@ -55,8 +55,8 @@ export function HeroCarousel({ items }: HeroCarouselProps) {
         >
           <div className="absolute inset-0">
             <img
-              src={item.banner_url || item.icon_url}
-              alt={item.title}
+              src={item.screenshots[0] || item.icon}
+              alt={item.name}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/30" />
@@ -80,7 +80,7 @@ export function HeroCarousel({ items }: HeroCarouselProps) {
                   </div>
                 </div>
                 <h2 className="text-2xl md:text-4xl font-bold mb-2 text-foreground">
-                  {item.title}
+                  {item.name}
                 </h2>
                 <p className="text-sm md:text-base text-muted-foreground mb-4">
                   by {item.developer}

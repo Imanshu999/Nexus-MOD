@@ -6,17 +6,13 @@ import {
   getTrendingApps,
   getRecentApps,
   getRecommendedApps,
-} from '@/lib/queries';
+} from '@/lib/data';
 
-export const revalidate = 300;
-
-export default async function HomePage() {
-  const [featured, trending, recent, recommended] = await Promise.all([
-    getFeaturedApps(),
-    getTrendingApps(),
-    getRecentApps(),
-    getRecommendedApps(),
-  ]);
+export default function HomePage() {
+  const featured = getFeaturedApps();
+  const trending = getTrendingApps();
+  const recent = getRecentApps();
+  const recommended = getRecommendedApps();
 
   return (
     <div className="min-h-screen">
@@ -54,7 +50,7 @@ export default async function HomePage() {
       <section className="container mx-auto max-w-7xl px-4 mt-12 mb-8">
         <div className="glass-card p-6 md:p-8 grid grid-cols-2 md:grid-cols-4 gap-6">
           <div className="text-center">
-            <div className="text-2xl md:text-3xl font-bold gradient-text">24+</div>
+            <div className="text-2xl md:text-3xl font-bold gradient-text">12+</div>
             <p className="text-xs md:text-sm text-muted-foreground mt-1">
               Apps & Games
             </p>

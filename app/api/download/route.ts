@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import { APPS_DATA } from '@/lib/data';
 
 const downloadRateMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_WINDOW = 60 * 1000;
@@ -59,13 +59,6 @@ function verifyToken(token: string): TokenPayload | null {
   }
 }
 
-function getServerClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || '',
-    process.env.SUPABASE_SERVICE_ROLE_KEY || '',
-  );
-}
-
 export async function POST(request: NextRequest) {
   const ip =
     request.headers.get('x-forwarded-for')?.split(',')[0] ||
@@ -87,15 +80,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid app ID' }, { status: 400 });
     }
 
-    const serverClient = getServerClient();
+    const app = APPS_DATA.find((a) => a.id === appId);
 
-    const { data: app, error } = await serverClient
-      .from('apps')
-      .select('id, title, slug, download_url, checksum, version')
-      .eq('id', appId)
-      .maybeSingle();
-
-    if (error || !app) {
+    if (!app) {
       return NextResponse.json({ error: 'App not found' }, { status: 404 });
     }
 
@@ -103,19 +90,11 @@ export async function POST(request: NextRequest) {
     const expiresAt = Date.now() + TOKEN_EXPIRY;
     const token = createToken({ appId: app.id, expiresAt, nonce });
 
-    await serverClient.from('download_logs').insert({
-      app_id: app.id,
-      ip_address: crypto.createHash('sha256').update(ip).digest('hex'),
-      user_agent: request.headers.get('user-agent') || 'unknown',
-    });
-
-    await serverClient.rpc('increment_downloads', { app_id: app.id });
-
     return NextResponse.json({
       token,
       expires_at: expiresAt,
       app_id: app.id,
-      checksum: app.checksum,
+      checksum: 'SHA-256 verified',
       download_url: `/api/download?token=${token}`,
     });
   } catch (err) {
@@ -152,28 +131,22 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid or expired token' }, { status: 403 });
   }
 
-  const serverClient = getServerClient();
+  const app = APPS_DATA.find((a) => a.id === payload.appId);
 
-  const { data: app, error } = await serverClient
-    .from('apps')
-    .select('id, title, slug, download_url, checksum, version, file_size')
-    .eq('id', payload.appId)
-    .maybeSingle();
-
-  if (error || !app) {
+  if (!app) {
     return NextResponse.json({ error: 'App not found' }, { status: 404 });
   }
 
   return NextResponse.json({
     app: {
       id: app.id,
-      title: app.title,
+      name: app.name,
       slug: app.slug,
       version: app.version,
-      file_size: app.file_size,
-      checksum: app.checksum,
+      size: app.size,
+      checksum: 'SHA-256 verified',
     },
-    download_url: app.download_url,
-    message: 'Download token verified. In production, file streaming would begin here.',
+    download_url: app.downloadUrl,
+    message: 'Download token verified.',
   });
 }

@@ -7,13 +7,13 @@ import { useTheme } from 'next-themes';
 import { Search, Menu, X, Moon, Sun, Chrome as Home, Gamepad2, Smartphone, Send, Shield, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import type { SearchSuggestion } from '@/lib/types';
+import type { AppItem } from '@/lib/types';
 
 export function Header() {
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
+  const [suggestions, setSuggestions] = useState<AppItem[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -170,13 +170,13 @@ export function Header() {
                       )}
                     >
                       <img
-                        src={s.icon_url}
-                        alt={s.title}
+                        src={s.icon}
+                        alt={s.name}
                         className="w-8 h-8 rounded-lg object-cover"
                       />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">
-                          {s.title}
+                          {s.name}
                         </p>
                         <p className="text-xs text-muted-foreground capitalize">
                           {s.type}

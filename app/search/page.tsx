@@ -5,12 +5,12 @@ import { useSearchParams } from 'next/navigation';
 import { Search, X } from 'lucide-react';
 import { AppCard } from '@/components/app-card';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { AppListItem } from '@/lib/types';
+import type { AppItem } from '@/lib/types';
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
-  const [results, setResults] = useState<AppListItem[]>([]);
+  const [results, setResults] = useState<AppItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -1,10 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Download, Shield, CircleCheck as CheckCircle, Loader as Loader2, TriangleAlert as AlertTriangle } from 'lucide-react';
+import { Download, Shield, CheckCircle, Loader2, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import type { AppItem, AppListItem } from '@/lib/types';
-import { formatDownloads } from '@/lib/queries';
+import type { AppItem } from '@/lib/types';
 
 export function DownloadButton({ app }: { app: AppItem }) {
   const [state, setState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -51,7 +50,7 @@ export function DownloadButton({ app }: { app: AppItem }) {
         </a>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <CheckCircle className="w-4 h-4 text-success" />
-          <span>Token verificado — SHA-256: {downloadInfo.checksum?.slice(0, 16)}...</span>
+          <span>Token verificado — {downloadInfo.checksum}</span>
         </div>
       </div>
     );
@@ -97,34 +96,36 @@ export function DownloadButton({ app }: { app: AppItem }) {
 
 interface AppDetailClientProps {
   app: AppItem;
-  related: AppListItem[];
+  related: AppItem[];
 }
 
 export function AppDetailClient({ app, related: _related }: AppDetailClientProps) {
   return (
     <div className="min-h-screen container mx-auto max-w-7xl px-4 py-6">
+      {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-muted-foreground mb-6">
         <a href="/" className="hover:text-primary">Inicio</a>
         <span>/</span>
-        <a href={app.type === 'game' ? '/games' : '/apps'} className="hover:text-primary capitalize">
-          {app.type === 'game' ? 'Juegos' : 'Apps'}
+        <a href={app.type === 'Game' ? '/games' : '/apps'} className="hover:text-primary capitalize">
+          {app.type === 'Game' ? 'Juegos' : 'Apps'}
         </a>
         <span>/</span>
-        <span className="text-foreground">{app.title}</span>
+        <span className="text-foreground">{app.name}</span>
       </div>
 
+      {/* Header Card */}
       <div className="glass-card p-6 md:p-8 mb-6">
         <div className="flex flex-col md:flex-row gap-6">
           <div className="w-24 h-24 md:w-32 md:h-32 rounded-3xl overflow-hidden ring-2 ring-border/50 shrink-0">
             <img
-              src={app.icon_url}
-              alt={app.title}
+              src={app.icon}
+              alt={app.name}
               className="w-full h-full object-cover"
             />
           </div>
 
           <div className="flex-1">
-            <h1 className="text-2xl md:text-3xl font-bold mb-1">{app.title}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold mb-1">{app.name}</h1>
             <p className="text-sm text-muted-foreground mb-3">
               by {app.developer}
             </p>
@@ -134,10 +135,10 @@ export function AppDetailClient({ app, related: _related }: AppDetailClientProps
                 <span className="text-warning">★★★★★</span>
               </div>
               <div className="text-sm text-muted-foreground">
-                {formatDownloads(app.downloads)} descargas
+                {app.downloads} descargas
               </div>
               <div className="text-sm text-muted-foreground">
-                {app.file_size}
+                {app.size}
               </div>
               <div className="text-sm text-muted-foreground">
                 v{app.version}
@@ -154,6 +155,7 @@ export function AppDetailClient({ app, related: _related }: AppDetailClientProps
         </div>
       </div>
 
+      {/* Description */}
       <div className="glass-card p-6 md:p-8 mb-6">
         <h2 className="text-lg font-bold mb-3">Descripcion</h2>
         <p className="text-sm text-muted-foreground leading-relaxed">
@@ -161,6 +163,7 @@ export function AppDetailClient({ app, related: _related }: AppDetailClientProps
         </p>
       </div>
 
+      {/* Screenshots */}
       {app.screenshots && app.screenshots.length > 0 && (
         <div className="mb-6">
           <h2 className="text-lg font-bold mb-4">Capturas de pantalla</h2>
@@ -175,7 +178,7 @@ export function AppDetailClient({ app, related: _related }: AppDetailClientProps
               >
                 <img
                   src={screenshot}
-                  alt={`${app.title} screenshot ${i + 1}`}
+                  alt={`${app.name} screenshot ${i + 1}`}
                   className="w-full h-full object-cover"
                 />
               </motion.div>
@@ -184,23 +187,22 @@ export function AppDetailClient({ app, related: _related }: AppDetailClientProps
         </div>
       )}
 
+      {/* Information Table */}
       <div className="glass-card p-6 md:p-8 mb-6">
         <h2 className="text-lg font-bold mb-4">Informacion</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <InfoItem label="Version" value={app.version} />
-          <InfoItem label="Tamaño" value={app.file_size} />
+          <InfoItem label="Tamaño" value={app.size} />
           <InfoItem label="Desarrollador" value={app.developer} />
-          <InfoItem label="Categoria" value={app.category?.name || 'N/A'} />
-          <InfoItem label="Descargas" value={formatDownloads(app.downloads)} />
+          <InfoItem label="Categoria" value={app.category} />
+          <InfoItem label="Descargas" value={app.downloads} />
           <InfoItem label="Valoracion" value={`${app.rating} / 5`} />
-          <InfoItem label="Tipo" value={app.type === 'game' ? 'Juego' : 'App'} />
-          <InfoItem
-            label="Actualizado"
-            value={new Date(app.updated_at).toLocaleDateString('es')}
-          />
+          <InfoItem label="Tipo" value={app.type} />
+          <InfoItem label="Actualizado" value={app.updatedAt} />
         </div>
       </div>
 
+      {/* Security & Integrity */}
       <div className="glass-card p-6 md:p-8">
         <div className="flex items-center gap-2 mb-3">
           <Shield className="w-5 h-5 text-success" />
@@ -209,15 +211,15 @@ export function AppDetailClient({ app, related: _related }: AppDetailClientProps
         <div className="space-y-2 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-success shrink-0" />
-            <span>Archivo verificado con checksum SHA-256</span>
+            <span>{app.security.checksum}</span>
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-success shrink-0" />
-            <span>Descarga mediante token seguro (sin hotlinking)</span>
+            <span>{app.security.secureToken}</span>
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-success shrink-0" />
-            <span>Almacenamiento en nube con acceso privado</span>
+            <span>{app.security.cloudStorage}</span>
           </div>
         </div>
       </div>

@@ -1,9 +1,6 @@
 import { CategoryPage } from '@/components/category-page';
-import { getCategories } from '@/lib/queries';
+import { CATEGORIES_DATA } from '@/lib/data';
 
-export const revalidate = 300;
-
-export default async function GamesPage() {
-  const categories = await getCategories();
-  return <CategoryPage type="game" categories={categories} />;
+export default function GamesPage() {
+  return <CategoryPage type="game" categories={CATEGORIES_DATA} />;
 }
